@@ -1,0 +1,68 @@
+'''
+Author:Jiaqi Lin
+Date:2019-4-23
+Function:
+
+温度数据的曲线拟合
+
+下面是从1月开始阿拉斯加每个月的温度极值（摄氏度）：
+
+最大值: 17, 19, 21, 28, 33, 38, 37, 37, 31, 23, 19, 18
+
+最小值: -62, -59, -56, -46, -32, -18, -9, -13, -25, -46, -52, -58
+
+绘制这些温度极值。
+定义一个函数，可以描述温度的最大值和最小值。提示：这个函数的周期是一年。提示：包含时间偏移。
+用scipy.optimize.curve_fit()拟合这个函数与数据。
+绘制结果。这个拟合合理吗？如果不合理，为什么？
+最低温度和最高温度的时间偏移是否与拟合一样精确？
+
+'''
+
+# -*- coding: utf-8 -*-
+import numpy as np
+from scipy.optimize import leastsq
+import pylab as pl
+from scipy.optimize import curve_fit
+
+
+
+pl.rcParams['font.family'] = ['simHei']
+pl.rcParams['font.sans-serif'] = ['simHei'] # 步骤一（替换sans-serif字体）
+pl.rcParams['axes.unicode_minus'] = False   # 步骤二（解决坐标轴负数的负号显示问题）
+
+x=np.arange(1,13,1)
+x1=np.arange(1,13,0.1)
+ymax=np.array([17, 19, 21, 28, 33, 38, 37, 37, 31, 23, 19, 18 ])  #每月温度最高值真实数据
+ymin=np.array([-62, -59, -56, -46, -32, -18, -9, -13, -25, -46, -52, -58]) #每月温度最低值真实数据
+
+def fmax(x,a,b,c):
+    """
+    数据拟合所用的函数: a*np.sin(x*np.pi/6+b)+c
+    """
+    return a*np.sin(x*np.pi/6+b)+c
+
+
+def fmin(x,a,b,c):
+    """
+    数据拟合所用的函数: a*np.sin(x*np.pi/6+b)+c
+    """
+    return a*np.sin(x*np.pi/6+b)+c
+
+fita,fitb=curve_fit(fmax,x,ymax,[1,1,1])
+fitc,fitd=curve_fit(fmin,x,ymin,[1,1,1])
+print(fita,fitb)
+print(fitc,fitd)
+
+pl.plot(x,ymax,label=u"最大值真实数据",color='m',linestyle='-',marker='')#绘制每月温度最大值真实数据
+pl.plot(x1,fmax(x1,fita[0],fita[1],fita[2]),label=u"最大值拟合数据",color='g',linestyle='-',marker='')#绘制每月温度最大值拟合曲线
+
+pl.plot(x,ymin,label=u"最小值真实数据",color='b',linestyle='-',marker='')#绘制每月温度最小值真实数据
+pl.plot(x1,fmin(x1,fitc[0],fitc[1],fitc[2]),label=u"最小值拟合数据",color='r',linestyle='-',marker='')#绘制每月温度最小值拟合曲线
+pl.title("温度数据的曲线拟合")
+pl.xlabel("月份")
+pl.ylabel("温度/°")
+pl.legend()
+pl.show()
+
+
